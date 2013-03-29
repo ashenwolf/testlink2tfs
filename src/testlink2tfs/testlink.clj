@@ -18,7 +18,8 @@
                    :details      "full" }))
 
 (defn extract-images [html-text]
-  (map #(-> % :attrs :src) (-> html-text java.io.StringReader. html/html-resource (html/select [:img]))))
+  (if (not-empty html-text)
+    (map #(-> % :attrs :src) (-> html-text java.io.StringReader. html/html-resource (html/select [:img])))))
 
 (defn to-test-case [{tlid      :id,
                      tlname    :name,
