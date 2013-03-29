@@ -3,5 +3,9 @@
   :url "https://github.com/ashenwolf/testlink2tfs"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]]
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [clj-yaml "0.4.0"]
+                 [necessary-evil "2.0.0"]
+                 [enlive "1.1.1"]
+                 [com.microsoft.tfs.sdk "11.0.0"]]
   :main testlink2tfs.core)
