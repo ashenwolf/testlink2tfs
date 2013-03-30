@@ -8,4 +8,5 @@
                  [necessary-evil "2.0.0"]
                  [enlive "1.1.1"]
                  [com.microsoft.tfs.sdk "11.0.0"]]
+  :jvm-opts ["-Dcom.microsoft.tfs.jni.native.base-directory=redist\\native"] 
   :main testlink2tfs.core)

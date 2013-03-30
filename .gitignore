@@ -3,6 +3,7 @@
 /lib
 /classes
 /checkouts
+/redist
 pom.xml
 pom.xml.asc
 *.jar
