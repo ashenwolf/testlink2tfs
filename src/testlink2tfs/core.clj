@@ -6,8 +6,9 @@
 
 (defn test-migration [settings cases-num]
   (let [project       (tfs/connect-to-tfs-project settings)
-        tl-test-cases (take cases-num (tl/get-test-cases settings))]
-    (map #(tfs/add-test-case project %) tl-test-cases)))
+        tl-test-cases (nth (tl/get-test-cases settings) cases-num)]
+    (map #(tfs/add-test-case project %) [tl-test-cases])))
+;    (map #(println %) [tl-test-cases])))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -17,4 +18,4 @@
   (println "Hello, World!"))
 
 
-(test-migration "tl2tfs.conf.yaml" 5)
+;(test-migration "tl2tfs.conf.yaml" 5)

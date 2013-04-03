@@ -12,7 +12,7 @@
 
 (defn pull-test-cases [settings-path]
   (def settings (load-settings settings-path))
-  (xmlrpc/call (get-in settings [:tl :url]) :tl.getTestCasesForTestSuite
+  (xmlrpc/call (-> settings :tl :url) :tl.getTestCasesForTestSuite
                  { :devKey       (get-in settings [:tl :devkey]) 
                    :testsuiteid  (get-in settings [:tl :tsid])
                    :details      "full" }))

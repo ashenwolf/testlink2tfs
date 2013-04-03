@@ -5,6 +5,7 @@
 /checkouts
 /redist
 /docs
+/tmp
 pom.xml
 pom.xml.asc
 *.jar
