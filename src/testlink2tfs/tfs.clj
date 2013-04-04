@@ -1,7 +1,8 @@
 (ns testlink2tfs.tfs
-  (:require [clj-yaml.core :as yaml]
-            [clojure.java.io :as io]
-            [net.cgrand.enlive-html :as html])
+  (:require [clj-yaml.core          :as yaml]
+            [clojure.java.io        :as io]
+            [net.cgrand.enlive-html :as html]
+            [clojure.data.xml       :as xml])
   (:import testlink2tfs.testlink.TestCase
            java.io.File
            com.microsoft.tfs.core.TFSTeamProjectCollection
@@ -9,7 +10,8 @@
            com.microsoft.tfs.core.clients.workitem.CoreFieldReferenceNames
            com.microsoft.tfs.core.clients.workitem.files.AttachmentFactory
            com.microsoft.tfs.core.httpclient.UsernamePasswordCredentials
-           com.microsoft.tfs.core.util.URIUtils))
+           com.microsoft.tfs.core.util.URIUtils
+           org.apache.commons.lang.StringEscapeUtils))
 
 
 (defn load-settings [path]
@@ -42,24 +44,57 @@
     (def tfs-summary (html/sniptest summary
        [:img] (fn [node] (update-in node [:attrs :src] #(match-url %)))))
     (-> wi .getFields (.getField CoreFieldReferenceNames/DESCRIPTION) (.setValue tfs-summary))
-    (-> wi .save)
-    ;(reduce #(apply clojure.string/replace %1 %2) summary (map vector tl-images attachments))
-    ))
+    (-> wi .save)))
 
+(defn extract-steps [tlsteps tlexp]
+  (let [html-steps (-> (if (nil? tlsteps) "" tlsteps) java.io.StringReader. html/html-resource)
+        html-exp   (-> (if (nil? tlexp) "" tlexp) java.io.StringReader. html/html-resource)]
+    (defn extractor [content]
+      ;(println (-> content (html/select #{[:li] [:p]})))
+      (map 
+        (fn [{cont :content}]
+          (let [cnt (first cont)] (if (string? cnt) cnt (-> (apply str (html/emit* cnt)) StringEscapeUtils/escapeHtml))))
+        (-> content (html/select #{[:li] [:p]}))))
+    (concat (extractor html-steps) (extractor html-exp))))
+
+(defn to-xml [steps]
+  (defn make-xml-steps [steps]
+    (let [id (atom 0)]
+      (map (fn [step]
+           (swap! id inc)
+           (println step)
+           (xml/element :step {:type "ActionStep" :id @id} 
+             (xml/element :parameterizedString {:isformatted "true"} step)
+             (xml/element :parameterizedString {:isformatted "true"})
+             (xml/element :description {}))) steps)))    
+  
+  (xml/emit-str (xml/element :steps {:last 4 :id 0} (make-xml-steps steps))))
 
 (defn add-test-case [project tl-test-case]
   (let [tc-wit (-> project .getWorkItemTypes (.get "Test Case"))
         tfs-test-case (-> project .getWorkItemClient (.newWorkItem tc-wit))]
     ; set name
+    (println (:tcname tl-test-case))
     (-> tfs-test-case (.setTitle (:tcname tl-test-case)))
-    ; save test case
     ; upload images
     (doseq [img (:tcimgs tl-test-case)] (move-attachment tfs-test-case img))
-    ; set description
-    ;(-> tfs-test-case .getFields (.getField CoreFieldReferenceNames/DESCRIPTION) (.setValue (:tcsummary tl-test-case)))
+    ; add steps
+    ;(println (to-xml (extract-steps (:tcsteps tl-test-case) (:tcexp tl-test-case))))
+    (-> tfs-test-case .getFields (.getField "Steps")
+        (.setValue (to-xml (extract-steps (:tcsteps tl-test-case) (:tcexp tl-test-case)))))
     ; save test case
     (-> tfs-test-case .save)
     ; update summary
-    (update-summary project (-> tfs-test-case .getID ) (:tcsummary tl-test-case))
+    (if-not (clojure.string/blank? (:tcsummary tl-test-case))
+      (update-summary project (-> tfs-test-case .getID ) (:tcsummary tl-test-case)))
     ; return id
     (-> tfs-test-case .getID)))
+
+
+;<steps last=\"4\" id=\"0\">
+;  <step type=\"ActionStep\" id=\"1\">
+;    <parameterizedString isformatted=\"true\">xxx</parameterizedString>
+;    <parameterizedString isformatted=\"true\" />
+;    <description />
+;  </step>
+;</steps>
