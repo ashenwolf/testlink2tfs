@@ -8,7 +8,6 @@
                  [necessary-evil "2.0.0"]
                  [org.clojure/data.xml "0.0.7"]
                  [enlive "1.1.1"]
-                 [com.microsoft.tfs.sdk "11.0.0"]
-                 [commons-lang "2.4"]]
+                 [com.microsoft.tfs.sdk "11.0.0"]]
   :jvm-opts ["-Dcom.microsoft.tfs.jni.native.base-directory=redist\\native"] 
   :main testlink2tfs.core)

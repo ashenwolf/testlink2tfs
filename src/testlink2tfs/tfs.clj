@@ -11,7 +11,7 @@
            com.microsoft.tfs.core.clients.workitem.files.AttachmentFactory
            com.microsoft.tfs.core.httpclient.UsernamePasswordCredentials
            com.microsoft.tfs.core.util.URIUtils
-           org.apache.commons.lang.StringEscapeUtils))
+           java.net.URLDecoder java.net.URLEncoder))
 
 
 (defn load-settings [path]
@@ -26,7 +26,7 @@
 
 (defn move-attachment [tfs-case tl-img]
   (let [settings (load-settings "tl2tfs.conf.yaml")
-        filename-short (last (clojure.string/split tl-img #"/"))
+        filename-short (URLDecoder/decode (last (clojure.string/split tl-img #"/")))
         filename (clojure.string/join ["tmp/", filename-short])]
     (with-open [output (io/output-stream filename)]
       (io/copy (io/input-stream (clojure.string/join [(-> settings :tl :www-prefix) tl-img])) output))
@@ -38,9 +38,9 @@
         attachments (map #(-> % .getURL .toString) (-> wi .getAttachments seq))]
     (def html-text (-> summary java.io.StringReader. html/html-resource))
     (defn match-url [url]
-      (let [fname (last (clojure.string/split url #"/"))
+      (let [fname (URLDecoder/decode (last (clojure.string/split url #"/")))
             rx    (re-pattern (clojure.string/join ["^.*" fname "$"]))]
-        (some #(re-find rx %) attachments)))
+        (some #(re-find rx (URLDecoder/decode %)) attachments)))
     (def tfs-summary (html/sniptest summary
        [:img] (fn [node] (update-in node [:attrs :src] #(match-url %)))))
     (-> wi .getFields (.getField CoreFieldReferenceNames/DESCRIPTION) (.setValue tfs-summary))
@@ -50,11 +50,7 @@
   (let [html-steps (-> (if (nil? tlsteps) "" tlsteps) java.io.StringReader. html/html-resource)
         html-exp   (-> (if (nil? tlexp) "" tlexp) java.io.StringReader. html/html-resource)]
     (defn extractor [content]
-      ;(println (-> content (html/select #{[:li] [:p]})))
-      (map 
-        (fn [{cont :content}]
-          (let [cnt (first cont)] (if (string? cnt) cnt (-> (apply str (html/emit* cnt)) StringEscapeUtils/escapeHtml))))
-        (-> content (html/select #{[:li] [:p]}))))
+      (map #(apply str (-> % (html/at [:*] html/unwrap))) (-> content (html/select #{[:li] [:p]}))))
     (concat (extractor html-steps) (extractor html-exp))))
 
 (defn to-xml [steps]
@@ -62,13 +58,13 @@
     (let [id (atom 0)]
       (map (fn [step]
            (swap! id inc)
-           (println step)
+           ;(println step)
            (xml/element :step {:type "ActionStep" :id @id} 
-             (xml/element :parameterizedString {:isformatted "true"} step)
-             (xml/element :parameterizedString {:isformatted "true"})
+             (xml/element :parameterizedString {} step)
+             (xml/element :parameterizedString {})
              (xml/element :description {}))) steps)))    
   
-  (xml/emit-str (xml/element :steps {:last 4 :id 0} (make-xml-steps steps))))
+  (xml/emit-str (xml/element :steps {:last (count steps) :id 0} (make-xml-steps steps))))
 
 (defn add-test-case [project tl-test-case]
   (let [tc-wit (-> project .getWorkItemTypes (.get "Test Case"))
@@ -79,9 +75,8 @@
     ; upload images
     (doseq [img (:tcimgs tl-test-case)] (move-attachment tfs-test-case img))
     ; add steps
-    ;(println (to-xml (extract-steps (:tcsteps tl-test-case) (:tcexp tl-test-case))))
-    (-> tfs-test-case .getFields (.getField "Steps")
-        (.setValue (to-xml (extract-steps (:tcsteps tl-test-case) (:tcexp tl-test-case)))))
+    (def steps (to-xml (remove #(clojure.string/blank? %) (extract-steps (:tcsteps tl-test-case) (:tcexp tl-test-case)))))
+    (-> tfs-test-case .getFields (.getField "Steps") (.setValue steps))
     ; save test case
     (-> tfs-test-case .save)
     ; update summary
