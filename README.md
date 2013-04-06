@@ -49,6 +49,8 @@ For convenience you can use the testlink2tfs.bat file:
 
 - no high or critical severity issues
 
+If you find any issues or have suggestions for improvements please use [issue tracker](https://github.com/ashenwolf/testlink2tfs/issues).
+
 ## License
 
 Copyright © 2013 Materialise Dental Ukraine
