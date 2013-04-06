@@ -4,19 +4,22 @@
   (:gen-class))
 
 
-(defn test-migration [settings cases-num]
-  (let [project       (tfs/connect-to-tfs-project settings)
-        tl-test-cases (take cases-num (tl/get-test-cases settings))]
-    ;(println (count tl-test-cases))
-    ;(map #(println (:tcname %)) tl-test-cases)
-    (map #(tfs/add-test-case project %) tl-test-cases)))
+(defn test-migration
+  ([settings] (test-migration settings nil))
+  ([settings cases-num]
+     (let [project       (tfs/connect-to-tfs-project settings)
+           all-cases     (tl/get-test-cases settings)
+           tl-test-cases (if (nil? cases-num) all-cases (take (Integer. cases-num) all-cases))]
+     (def cases-num (count (map #(tfs/add-test-case project %) tl-test-cases)))
+     (println "Migration completed...")
+     (println cases-num "test case(s) migrated"))))
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "tfs2testlink <config file> <case limit>"
   [& args]
   ;; work around dangerous default behaviour in Clojure
   (alter-var-root #'*read-eval* (constantly false))
-  (println "Hello, World!"))
-
-
-(test-migration "tl2tfs.conf.yaml" 5)
+  
+  (if (<= 1 (count args) 2)
+      (apply test-migration args)
+      (println "tfs2testlink <config file> <case limit>")))
