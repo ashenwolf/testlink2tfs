@@ -12,7 +12,7 @@
            com.microsoft.tfs.core.clients.workitem.files.AttachmentFactory
            com.microsoft.tfs.core.httpclient.UsernamePasswordCredentials
            com.microsoft.tfs.core.util.URIUtils
-           java.net.URLDecoder java.net.URLEncoder))
+           java.net.URLDecoder java.util.regex.Pattern))
 
 
 (defn load-settings [path]
@@ -41,7 +41,7 @@
     (def html-text (-> summary java.io.StringReader. html/html-resource))
     (defn match-url [url]
       (let [fname (URLDecoder/decode (last (clojure.string/split url #"/")))
-            rx    (re-pattern (str "^.*" fname "$"))]
+            rx    (re-pattern (str "^.*" (Pattern/quote fname) "$"))]
         (some #(re-find rx (URLDecoder/decode %)) attachments)))
     (def tfs-summary (html/sniptest summary
        [:img] (fn [node] (update-in node [:attrs :src] #(match-url %)))))
