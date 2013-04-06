@@ -40,7 +40,7 @@ For convenience you can use the testlink2tfs.bat file:
 
 ## Options
 
-    $ testlink2tfs config-path [case-limit]`
+    $ testlink2tfs config-path [case-limit]
 
 - config-path: path to config file (required)
 - case-limit: number of testcases to import (optional; mostly useful for testing)
