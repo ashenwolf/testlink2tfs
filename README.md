@@ -19,7 +19,7 @@ First you need to create the config file to be used:
 tl: 
     url:         http://testlink-server/testlink/lib/api/xmlrpc.php
     tsid:        00000                             # root test suite id
-    devkey:      00000000000000000000000000000000  # deb key for test link
+    devkey:      00000000000000000000000000000000  # dev key for test link
     www-prefix:  http://testlink-server            # base directory for test link
     norec:       true                              # no recursive (will migrate only direct child items for tsid,
                                                    #    otherwise will plain inport all children without preserving test suite hierarchy)
