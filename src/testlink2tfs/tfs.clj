@@ -61,7 +61,8 @@
       (map (fn [step]
            (swap! id inc)
            (xml/element :step {:type "ActionStep" :id @id} 
-             (xml/element :parameterizedString {} step)
+             (xml/element :parameterizedString {} 
+                          (xml/element :text {} step))
              (xml/element :parameterizedString {})
              (xml/element :description {}))) steps)))    
   

@@ -1,4 +1,4 @@
-(defproject testlink2tfs "0.1.0-SNAPSHOT"
+(defproject testlink2tfs "0.1.1-SNAPSHOT"
   :description "A tool to migrate test cases from Testlink to TFS"
   :url "https://github.com/ashenwolf/testlink2tfs"
   :license {:name "Eclipse Public License"
