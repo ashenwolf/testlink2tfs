@@ -9,7 +9,7 @@ Note: Attachments are not migrated, test suite hierarchy in TestLink is not pres
 
 ## Installation
 
-Download from [SourceForge](https://sourceforge.net/projects/testlink2tfs/files/latest/download).
+Download latest version from [SourceForge](https://sourceforge.net/projects/testlink2tfs/files/latest/download).
 
 ## Usage
 
