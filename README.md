@@ -22,7 +22,7 @@ tl:
     devkey:      00000000000000000000000000000000  # dev key for test link
     www-prefix:  http://testlink-server            # base directory for test link
     norec:       true                              # no recursive (will migrate only direct child items for tsid,
-                                                   #    otherwise will plain inport all children without preserving test suite hierarchy)
+                                                   #    otherwise will plain import all children without preserving test suite hierarchy)
 tfs: 
     url:         https://tfs.yourcompany.com/tfs/DefaultCollection      # tfs collection url
     project:     Test_Project                                           # tfs project
