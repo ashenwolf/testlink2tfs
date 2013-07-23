@@ -2,8 +2,8 @@
 
 testlink2tfs is a tool designed to migrate test cases from TestLink to TFS. The following fields are migrated:
 - Test Case name
-- Summary (TestLink) -> Description (TFS) (migrates images too!)
-- Steps + Expected results (TestLink) -> Steps (Action column) in TFS
+- Summary (TestLink) &rarr; Description (TFS) (migrates images too!)
+- Steps + Expected results (TestLink) &rarr; Steps (Action column) in TFS
 
 Note: Attachments are not migrated, test suite hierarchy in TestLink is not preserved!
 
