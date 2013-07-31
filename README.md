@@ -38,14 +38,14 @@ For convenience you can use the testlink2tfs.bat file:
 
     $ testlink2tfs.bat tl2tfs.conf
 
-## Options
+### Options
 
     $ testlink2tfs config-path [case-limit]
 
 - config-path: path to config file (required)
 - case-limit: number of testcases to import (optional; mostly useful for testing)
 
-### Bugs
+## Known issues
 
 - Exception when there are two images with the same name in summary during import
 
