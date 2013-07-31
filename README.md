@@ -47,7 +47,7 @@ For convenience you can use the testlink2tfs.bat file:
 
 ### Bugs
 
-- no high or critical severity issues
+- Exception when there are two images with the same name in summary during import
 
 If you find any issues or have suggestions for improvements please use [issue tracker](https://github.com/ashenwolf/testlink2tfs/issues).
 
